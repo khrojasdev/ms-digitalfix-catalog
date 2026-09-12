@@ -99,4 +99,10 @@ class ServicioControllerTest {
            .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }
 
+    @Test
+    @DisplayName("desactivar responde 204 sin cuerpo")
+    void desactivarEs204() throws Exception {
+        mvc.perform(delete("/api/catalog/services/1").header("X-Company-Id", "1"))
+           .andExpect(status().isNoContent());
+    }
 }
