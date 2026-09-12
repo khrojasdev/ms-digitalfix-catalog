@@ -1,10 +1,8 @@
 package cl.duoc.digitalfix.catalog.service;
 
 import cl.duoc.digitalfix.catalog.domain.Servicio;
-import cl.duoc.digitalfix.catalog.error.ConflictoDeDatos;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
 import cl.duoc.digitalfix.catalog.repository.ServicioRepository;
-import cl.duoc.digitalfix.catalog.web.dto.ServicioSolicitud;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
