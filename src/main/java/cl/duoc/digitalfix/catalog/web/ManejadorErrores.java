@@ -32,6 +32,22 @@ public class ManejadorErrores {
                 .body(RespuestaError.de("BAD_REQUEST", e.getMessage(), req.getRequestURI()));
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<RespuestaError> validacion(MethodArgumentNotValidException e, HttpServletRequest req) {
+        List<String> detalles = e.getBindingResult().getFieldErrors().stream()
+                .map(f -> f.getField() + ": " + f.getDefaultMessage()).toList();
+        return ResponseEntity.badRequest().body(RespuestaError.de(
+                "VALIDATION_ERROR", "la solicitud tiene campos invalidos", req.getRequestURI(), detalles));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<RespuestaError> restriccion(ConstraintViolationException e, HttpServletRequest req) {
+        List<String> detalles = e.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage()).toList();
+        return ResponseEntity.badRequest().body(RespuestaError.de(
+                "VALIDATION_ERROR", "la solicitud tiene campos invalidos", req.getRequestURI(), detalles));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RespuestaError> inesperado(Exception e, HttpServletRequest req) {
         log.error("error no controlado en {}", req.getRequestURI(), e);

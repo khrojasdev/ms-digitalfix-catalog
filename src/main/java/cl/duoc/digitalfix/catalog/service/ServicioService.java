@@ -3,6 +3,7 @@ package cl.duoc.digitalfix.catalog.service;
 import cl.duoc.digitalfix.catalog.domain.Servicio;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
 import cl.duoc.digitalfix.catalog.repository.ServicioRepository;
+import cl.duoc.digitalfix.catalog.web.dto.ServicioSolicitud;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,20 @@ public class ServicioService {
     public Servicio obtener(Long id) {
         return repositorio.findByIdAndCompanyId(id, contexto.companyId())
                 .orElseThrow(() -> new RecursoNoEncontrado("no existe el servicio " + id));
+    }
+
+    @Transactional
+    public Servicio crear(ServicioSolicitud solicitud) {
+        Long empresa = contexto.companyId();
+        return repositorio.save(new Servicio(empresa, solicitud.codigo(), solicitud.nombre(),
+                                             solicitud.descripcion(), solicitud.tarifa()));
+    }
+
+    @Transactional
+    public Servicio actualizar(Long id, ServicioSolicitud solicitud) {
+        Servicio servicio = obtener(id);
+        servicio.actualizar(solicitud.nombre(), solicitud.descripcion(), solicitud.tarifa());
+        return repositorio.save(servicio);
     }
 
 }
