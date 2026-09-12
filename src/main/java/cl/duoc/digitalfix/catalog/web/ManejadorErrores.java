@@ -26,6 +26,12 @@ public class ManejadorErrores {
                 .body(RespuestaError.de("NOT_FOUND", e.getMessage(), req.getRequestURI()));
     }
 
+    @ExceptionHandler(ConflictoDeDatos.class)
+    public ResponseEntity<RespuestaError> conflicto(ConflictoDeDatos e, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(RespuestaError.de("CONFLICT", e.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler(SolicitudInvalida.class)
     public ResponseEntity<RespuestaError> invalida(SolicitudInvalida e, HttpServletRequest req) {
         return ResponseEntity.badRequest()

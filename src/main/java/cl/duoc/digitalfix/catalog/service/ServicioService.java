@@ -1,6 +1,7 @@
 package cl.duoc.digitalfix.catalog.service;
 
 import cl.duoc.digitalfix.catalog.domain.Servicio;
+import cl.duoc.digitalfix.catalog.error.ConflictoDeDatos;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
 import cl.duoc.digitalfix.catalog.repository.ServicioRepository;
 import cl.duoc.digitalfix.catalog.web.dto.ServicioSolicitud;
@@ -35,6 +36,9 @@ public class ServicioService {
     @Transactional
     public Servicio crear(ServicioSolicitud solicitud) {
         Long empresa = contexto.companyId();
+        if (repositorio.existsByCompanyIdAndCodigo(empresa, solicitud.codigo())) {
+            throw new ConflictoDeDatos("ya existe un servicio con el codigo " + solicitud.codigo());
+        }
         return repositorio.save(new Servicio(empresa, solicitud.codigo(), solicitud.nombre(),
                                              solicitud.descripcion(), solicitud.tarifa()));
     }
@@ -42,6 +46,10 @@ public class ServicioService {
     @Transactional
     public Servicio actualizar(Long id, ServicioSolicitud solicitud) {
         Servicio servicio = obtener(id);
+        if (!servicio.getCodigo().equals(solicitud.codigo())
+                && repositorio.existsByCompanyIdAndCodigo(servicio.getCompanyId(), solicitud.codigo())) {
+            throw new ConflictoDeDatos("ya existe un servicio con el codigo " + solicitud.codigo());
+        }
         servicio.actualizar(solicitud.nombre(), solicitud.descripcion(), solicitud.tarifa());
         return repositorio.save(servicio);
     }

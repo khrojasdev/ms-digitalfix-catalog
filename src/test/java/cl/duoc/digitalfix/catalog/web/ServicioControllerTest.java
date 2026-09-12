@@ -1,6 +1,7 @@
 package cl.duoc.digitalfix.catalog.web;
 
 import cl.duoc.digitalfix.catalog.domain.Servicio;
+import cl.duoc.digitalfix.catalog.error.ConflictoDeDatos;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
 import cl.duoc.digitalfix.catalog.service.ServicioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,6 +59,20 @@ class ServicioControllerTest {
            .andExpect(jsonPath("$.error").value("NOT_FOUND"))
            .andExpect(jsonPath("$.path").value("/api/catalog/services/99"))
            .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    @DisplayName("un codigo repetido responde 409")
+    void codigoRepetidoEs409() throws Exception {
+        when(servicios.crear(any())).thenThrow(new ConflictoDeDatos("ya existe un servicio con el codigo MANT-01"));
+
+        mvc.perform(post("/api/catalog/services")
+                .header("X-Company-Id", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(Map.of(
+                        "codigo", "MANT-01", "nombre", "Mantencion", "tarifa", "85000.00"))))
+           .andExpect(status().isConflict())
+           .andExpect(jsonPath("$.error").value("CONFLICT"));
     }
 
     @Test

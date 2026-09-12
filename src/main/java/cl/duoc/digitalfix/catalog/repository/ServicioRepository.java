@@ -18,4 +18,5 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
     Page<Servicio> findByCompanyId(Long companyId, Pageable pageable);
 
+    boolean existsByCompanyIdAndCodigo(Long companyId, String codigo);
 }
