@@ -72,6 +72,20 @@ class ServicioServiceTest {
     }
 
     @Test
+    @DisplayName("desactivar no borra: deja el servicio inactivo")
+    void desactivaSinBorrar() {
+        Servicio existente = new Servicio(EMPRESA, "MANT-01", "Mantencion", null, new BigDecimal("1000"));
+        when(repositorio.findByIdAndCompanyId(1L, EMPRESA)).thenReturn(Optional.of(existente));
+        when(repositorio.save(any(Servicio.class))).thenAnswer(i -> i.getArgument(0));
+
+        servicio.desactivar(1L);
+
+        assertThat(existente.isActivo()).isFalse();
+        verify(repositorio, never()).delete(any());
+        verify(repositorio, never()).deleteById(any());
+    }
+
+    @Test
     @DisplayName("cambiar el codigo por uno ya usado devuelve conflicto")
     void rechazaCambioACodigoExistente() {
         Servicio existente = new Servicio(EMPRESA, "MANT-01", "Mantencion", null, new BigDecimal("1000"));

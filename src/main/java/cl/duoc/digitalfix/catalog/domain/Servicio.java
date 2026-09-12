@@ -64,6 +64,10 @@ public class Servicio {
         this.tarifa = tarifa;
     }
 
+    /** Desactivacion logica: el servicio sale del selector pero conserva su historial. */
+    public void desactivar() { this.activo = false; }
+    public void reactivar()  { this.activo = true; }
+
     public Long getId() { return id; }
     public Long getCompanyId() { return companyId; }
     public String getCodigo() { return codigo; }

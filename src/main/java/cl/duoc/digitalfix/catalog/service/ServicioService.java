@@ -22,8 +22,12 @@ public class ServicioService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Servicio> listar(Pageable pagina) {
-        return repositorio.findByCompanyId(contexto.companyId(), pagina);
+    public Page<Servicio> listar(Boolean soloActivos, Pageable pagina) {
+        Long empresa = contexto.companyId();
+        if (Boolean.TRUE.equals(soloActivos)) {
+            return repositorio.findByCompanyIdAndActivo(empresa, true, pagina);
+        }
+        return repositorio.findByCompanyId(empresa, pagina);
     }
 
     /** Un id de otra empresa se comporta igual que uno inexistente: 404. */
@@ -54,4 +58,11 @@ public class ServicioService {
         return repositorio.save(servicio);
     }
 
+    /** No se borra: se desactiva, para no romper las ordenes que lo referencian. */
+    @Transactional
+    public void desactivar(Long id) {
+        Servicio servicio = obtener(id);
+        servicio.desactivar();
+        repositorio.save(servicio);
+    }
 }

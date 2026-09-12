@@ -25,8 +25,10 @@ public class ServicioController {
     }
 
     @GetMapping
-    public Page<ServicioRespuesta> listar(@PageableDefault(size = 20, sort = "nombre") Pageable pagina) {
-        return servicios.listar(pagina).map(ServicioRespuesta::de);
+    public Page<ServicioRespuesta> listar(
+            @RequestParam(required = false, defaultValue = "true") Boolean soloActivos,
+            @PageableDefault(size = 20, sort = "nombre") Pageable pagina) {
+        return servicios.listar(soloActivos, pagina).map(ServicioRespuesta::de);
     }
 
     @GetMapping("/{id}")
@@ -44,6 +46,12 @@ public class ServicioController {
     public ServicioRespuesta actualizar(@PathVariable Long id,
                                         @Valid @RequestBody ServicioSolicitud solicitud) {
         return ServicioRespuesta.de(servicios.actualizar(id, solicitud));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desactivar(@PathVariable Long id) {
+        servicios.desactivar(id);
     }
 
 }
