@@ -1,5 +1,6 @@
 package cl.duoc.digitalfix.catalog.domain;
 
+import cl.duoc.digitalfix.catalog.error.StockInsuficiente;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -66,6 +67,21 @@ public class Repuesto {
         this.stock = stock;
         this.stockMinimo = stockMinimo;
         this.costoUnitario = costoUnitario;
+    }
+
+    /** Descuenta stock. Nunca deja el saldo bajo cero: si no alcanza, falla. */
+    public void descontar(int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("la cantidad debe ser mayor que cero");
+        if (cantidad > this.stock) {
+            throw new StockInsuficiente(
+                "stock insuficiente para el repuesto " + sku + ": hay " + stock + ", se piden " + cantidad);
+        }
+        this.stock -= cantidad;
+    }
+
+    public void reponer(int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("la cantidad debe ser mayor que cero");
+        this.stock += cantidad;
     }
 
     public boolean estaBajoMinimo() { return stock <= stockMinimo; }

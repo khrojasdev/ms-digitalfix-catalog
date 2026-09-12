@@ -32,6 +32,12 @@ public class ManejadorErrores {
                 .body(RespuestaError.de("CONFLICT", e.getMessage(), req.getRequestURI()));
     }
 
+    @ExceptionHandler(StockInsuficiente.class)
+    public ResponseEntity<RespuestaError> stock(StockInsuficiente e, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(RespuestaError.de("INSUFFICIENT_STOCK", e.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler(SolicitudInvalida.class)
     public ResponseEntity<RespuestaError> invalida(SolicitudInvalida e, HttpServletRequest req) {
         return ResponseEntity.badRequest()
