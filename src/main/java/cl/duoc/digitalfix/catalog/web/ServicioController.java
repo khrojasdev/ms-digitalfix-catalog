@@ -59,6 +59,11 @@ public class ServicioController {
         servicios.desactivar(id);
     }
 
+    @GetMapping("/{id}/parts")
+    public List<RepuestoDeServicioRespuesta> repuestos(@PathVariable Long id) {
+        return relaciones.listar(id);
+    }
+
     @PutMapping("/{id}/parts")
     public List<RepuestoDeServicioRespuesta> asociarRepuestos(
             @PathVariable Long id,
