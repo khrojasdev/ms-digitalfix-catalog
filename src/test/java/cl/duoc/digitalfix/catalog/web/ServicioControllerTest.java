@@ -3,6 +3,7 @@ package cl.duoc.digitalfix.catalog.web;
 import cl.duoc.digitalfix.catalog.domain.Servicio;
 import cl.duoc.digitalfix.catalog.error.ConflictoDeDatos;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
+import cl.duoc.digitalfix.catalog.service.ServicioRepuestoService;
 import cl.duoc.digitalfix.catalog.service.ServicioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,7 @@ class ServicioControllerTest {
     @Autowired ObjectMapper json;
 
     @MockBean ServicioService servicios;
+    @MockBean ServicioRepuestoService relaciones;
 
     private Servicio unServicio() {
         return new Servicio(1L, "MANT-01", "Mantencion preventiva", "Revision anual",
