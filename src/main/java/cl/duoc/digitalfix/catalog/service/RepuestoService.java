@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 @Service
 public class RepuestoService {
@@ -31,6 +32,11 @@ public class RepuestoService {
     public Repuesto obtener(Long id) {
         return repositorio.findByIdAndCompanyId(id, contexto.companyId())
                 .orElseThrow(() -> new RecursoNoEncontrado("no existe el repuesto " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Repuesto> bajoMinimo() {
+        return repositorio.findBajoMinimo(contexto.companyId());
     }
 
     @Transactional
