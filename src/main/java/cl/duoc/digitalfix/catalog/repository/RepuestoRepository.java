@@ -13,6 +13,7 @@ public interface RepuestoRepository extends JpaRepository<Repuesto, Long> {
 
     Page<Repuesto> findByCompanyId(Long companyId, Pageable pageable);
 
+    boolean existsByCompanyIdAndSku(Long companyId, String sku);
 
 
 }

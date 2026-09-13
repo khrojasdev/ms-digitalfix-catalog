@@ -1,6 +1,7 @@
 package cl.duoc.digitalfix.catalog.service;
 
 import cl.duoc.digitalfix.catalog.domain.Repuesto;
+import cl.duoc.digitalfix.catalog.error.ConflictoDeDatos;
 import cl.duoc.digitalfix.catalog.error.RecursoNoEncontrado;
 import cl.duoc.digitalfix.catalog.repository.RepuestoRepository;
 import cl.duoc.digitalfix.catalog.web.dto.RepuestoSolicitud;
@@ -35,6 +36,9 @@ public class RepuestoService {
     @Transactional
     public Repuesto crear(RepuestoSolicitud solicitud) {
         Long empresa = contexto.companyId();
+        if (repositorio.existsByCompanyIdAndSku(empresa, solicitud.sku())) {
+            throw new ConflictoDeDatos("ya existe un repuesto con el SKU " + solicitud.sku());
+        }
         return repositorio.save(new Repuesto(empresa, solicitud.sku(), solicitud.nombre(),
                                              solicitud.stock(), solicitud.stockMinimo(),
                                              solicitud.costoUnitario()));
@@ -43,9 +47,19 @@ public class RepuestoService {
     @Transactional
     public Repuesto actualizar(Long id, RepuestoSolicitud solicitud) {
         Repuesto repuesto = obtener(id);
+        if (!repuesto.getSku().equals(solicitud.sku())
+                && repositorio.existsByCompanyIdAndSku(repuesto.getCompanyId(), solicitud.sku())) {
+            throw new ConflictoDeDatos("ya existe un repuesto con el SKU " + solicitud.sku());
+        }
         repuesto.actualizar(solicitud.nombre(), solicitud.stock(),
                             solicitud.stockMinimo(), solicitud.costoUnitario());
         return repositorio.save(repuesto);
     }
 
+    @Transactional
+    public void desactivar(Long id) {
+        Repuesto repuesto = obtener(id);
+        repuesto.desactivar();
+        repositorio.save(repuesto);
+    }
 }
