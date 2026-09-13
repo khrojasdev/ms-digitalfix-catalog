@@ -1,8 +1,10 @@
 package cl.duoc.digitalfix.catalog.web;
 
+import cl.duoc.digitalfix.catalog.service.ServicioRepuestoService;
 import cl.duoc.digitalfix.catalog.service.ServicioService;
 import cl.duoc.digitalfix.catalog.web.dto.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -12,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/catalog/services")
@@ -19,9 +22,11 @@ import java.net.URI;
 public class ServicioController {
 
     private final ServicioService servicios;
+    private final ServicioRepuestoService relaciones;
 
-    public ServicioController(ServicioService servicios) {
+    public ServicioController(ServicioService servicios, ServicioRepuestoService relaciones) {
         this.servicios = servicios;
+        this.relaciones = relaciones;
     }
 
     @GetMapping
@@ -54,4 +59,11 @@ public class ServicioController {
         servicios.desactivar(id);
     }
 
+    @PutMapping("/{id}/parts")
+    public List<RepuestoDeServicioRespuesta> asociarRepuestos(
+            @PathVariable Long id,
+            @RequestBody @NotEmpty(message = "la lista de repuestos no puede estar vacia")
+            List<@Valid RepuestoDeServicio> repuestos) {
+        return relaciones.asociar(id, repuestos);
+    }
 }
