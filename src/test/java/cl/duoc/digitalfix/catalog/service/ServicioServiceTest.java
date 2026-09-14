@@ -96,4 +96,39 @@ class ServicioServiceTest {
         assertThatThrownBy(() -> servicio.actualizar(1L, cambio))
                 .isInstanceOf(ConflictoDeDatos.class);
     }
+
+    @Test
+    @DisplayName("reactivar vuelve a poner en circulacion un servicio dado de baja")
+    void reactivaUnServicioInactivo() {
+        Servicio existente = new Servicio(EMPRESA, "MANT-01", "Mantencion", null, new BigDecimal("1000"));
+        existente.desactivar();
+        when(repositorio.findByIdAndCompanyId(1L, EMPRESA)).thenReturn(Optional.of(existente));
+        when(repositorio.save(any(Servicio.class))).thenAnswer(i -> i.getArgument(0));
+
+        Servicio resultado = servicio.reactivar(1L);
+
+        assertThat(resultado.isActivo()).isTrue();
+    }
+
+    @Test
+    @DisplayName("reactivar uno que ya esta activo no escribe nada")
+    void reactivarUnActivoNoHaceNada() {
+        Servicio existente = new Servicio(EMPRESA, "MANT-01", "Mantencion", null, new BigDecimal("1000"));
+        when(repositorio.findByIdAndCompanyId(1L, EMPRESA)).thenReturn(Optional.of(existente));
+
+        Servicio resultado = servicio.reactivar(1L);
+
+        assertThat(resultado.isActivo()).isTrue();
+        verify(repositorio, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("reactivar un servicio de otra empresa se comporta como si no existiera")
+    void reactivarDeOtraEmpresaEs404() {
+        when(repositorio.findByIdAndCompanyId(99L, EMPRESA)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> servicio.reactivar(99L))
+                .isInstanceOf(RecursoNoEncontrado.class);
+        verify(repositorio, never()).save(any());
+    }
 }

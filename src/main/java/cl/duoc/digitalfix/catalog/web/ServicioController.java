@@ -59,6 +59,17 @@ public class ServicioController {
         servicios.desactivar(id);
     }
 
+    /**
+     * Reactivar es POST y no DELETE inverso ni PUT: no es idempotente por
+     * casualidad sino por diseno, y es una accion sobre el recurso, no un
+     * reemplazo de su contenido. Devuelve el servicio para que el cliente
+     * pueda refrescar la fila sin volver a pedir el listado.
+     */
+    @PostMapping("/{id}/activate")
+    public ServicioRespuesta reactivar(@PathVariable Long id) {
+        return ServicioRespuesta.de(servicios.reactivar(id));
+    }
+
     @GetMapping("/{id}/parts")
     public List<RepuestoDeServicioRespuesta> repuestos(@PathVariable Long id) {
         return relaciones.listar(id);
