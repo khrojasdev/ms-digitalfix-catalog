@@ -1,0 +1,10 @@
+# Lo que no tiene por que viajar al contexto de build.
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+README.md
+docs/
+.env
