@@ -65,4 +65,24 @@ public class ServicioService {
         servicio.desactivar();
         repositorio.save(servicio);
     }
+
+    /**
+     * Vuelve a poner en circulacion un servicio dado de baja.
+     *
+     * Es la contraparte de desactivar, y sin ella una baja era definitiva en la
+     * practica: el dato seguia ahi, visible con soloActivos=false, pero no
+     * habia forma de revertirla salvo tocando la base a mano.
+     *
+     * Reactivar uno que ya esta activo no es un error: el resultado pedido ya
+     * se cumple, asi que se devuelve tal cual y no se escribe nada.
+     */
+    @Transactional
+    public Servicio reactivar(Long id) {
+        Servicio servicio = obtener(id);
+        if (servicio.isActivo()) {
+            return servicio;
+        }
+        servicio.reactivar();
+        return repositorio.save(servicio);
+    }
 }
