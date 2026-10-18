@@ -23,6 +23,19 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+# Nomenclatura centralizada de la mensajeria: ningun nombre de exchange o
+# routing key se escribe a mano en el codigo.
+amqp:
+  exchange:
+    stock: catalogo.stock.exchange
+  routing-key:
+    stock-bajo-minimo: stock.bajo-minimo
 
 server:
   port: ${SERVER_PORT:8082}
