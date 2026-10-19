@@ -17,10 +17,13 @@ public class RepuestoService {
 
     private final RepuestoRepository repositorio;
     private final ContextoService contexto;
+    private final StockAlertaPublisher alertas;
 
-    public RepuestoService(RepuestoRepository repositorio, ContextoService contexto) {
+    public RepuestoService(RepuestoRepository repositorio, ContextoService contexto,
+                           StockAlertaPublisher alertas) {
         this.repositorio = repositorio;
         this.contexto = contexto;
+        this.alertas = alertas;
     }
 
     @Transactional(readOnly = true)
@@ -45,9 +48,11 @@ public class RepuestoService {
         if (repositorio.existsByCompanyIdAndSku(empresa, solicitud.sku())) {
             throw new ConflictoDeDatos("ya existe un repuesto con el SKU " + solicitud.sku());
         }
-        return repositorio.save(new Repuesto(empresa, solicitud.sku(), solicitud.nombre(),
+        Repuesto creado = repositorio.save(new Repuesto(empresa, solicitud.sku(), solicitud.nombre(),
                                              solicitud.stock(), solicitud.stockMinimo(),
                                              solicitud.costoUnitario()));
+        alertas.publicarSiBajoMinimo(creado);
+        return creado;
     }
 
     @Transactional
@@ -59,7 +64,9 @@ public class RepuestoService {
         }
         repuesto.actualizar(solicitud.nombre(), solicitud.stock(),
                             solicitud.stockMinimo(), solicitud.costoUnitario());
-        return repositorio.save(repuesto);
+        Repuesto actualizado = repositorio.save(repuesto);
+        alertas.publicarSiBajoMinimo(actualizado);
+        return actualizado;
     }
 
     @Transactional
