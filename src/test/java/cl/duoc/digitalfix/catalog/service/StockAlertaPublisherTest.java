@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 class StockAlertaPublisherTest {
 
     private StockAlertaPublisher nuevoPublisher(RabbitTemplate template) {
-        StockAlertaPublisher publisher = new StockAlertaPublisher(template, new ObjectMapper());
+        StockAlertaPublisher publisher = new StockAlertaPublisher(template, new ObjectMapper().findAndRegisterModules());
         ReflectionTestUtils.setField(publisher, "exchange", "catalogo.stock.exchange");
         ReflectionTestUtils.setField(publisher, "routingKey", "stock.bajo-minimo");
         return publisher;

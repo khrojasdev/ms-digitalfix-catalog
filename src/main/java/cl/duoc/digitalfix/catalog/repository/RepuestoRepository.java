@@ -3,7 +3,9 @@ package cl.duoc.digitalfix.catalog.repository;
 import cl.duoc.digitalfix.catalog.domain.Repuesto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,4 +26,12 @@ public interface RepuestoRepository extends JpaRepository<Repuesto, Long> {
     @Query("select r from Repuesto r where r.companyId = :companyId and r.activo = true "
          + "and r.stock <= r.stockMinimo order by r.stock asc, r.sku asc")
     List<Repuesto> findBajoMinimo(@Param("companyId") Long companyId);
+
+    /**
+     * Repuesto bloqueado para descontarle stock (SELECT ... FOR UPDATE), asi dos
+     * ordenes asignadas a la vez no se pisan el saldo.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from Repuesto r where r.id = :id and r.companyId = :companyId")
+    Optional<Repuesto> bloquearParaDescontar(@Param("id") Long id, @Param("companyId") Long companyId);
 }
