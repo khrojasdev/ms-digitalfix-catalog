@@ -34,8 +34,15 @@ spring:
 amqp:
   exchange:
     stock: catalogo.stock.exchange
+    # Exchange topic donde workorders publica los eventos de orden.
+    negocio: ordenes.negocio.exchange
+  queue:
+    # Ordenes asignadas: al recibirlas se descuenta el stock del servicio.
+    stock-ordenes: catalogo.stock.ordenes.queue
+    stock-ordenes-dlq: catalogo.stock.ordenes.dlq
   routing-key:
     stock-bajo-minimo: stock.bajo-minimo
+    orden-asignada: ordenes.eventos.asignada
 
 server:
   port: ${SERVER_PORT:8082}
