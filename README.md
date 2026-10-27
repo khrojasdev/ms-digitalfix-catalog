@@ -13,6 +13,25 @@ Catalogo tecnico: servicios, repuestos, stock y la relacion entre ambos.
 
 Spring Boot 3, Spring Data JPA, Oracle, Flyway
 
+## Mensajeria (RabbitMQ)
+
+Nombres en `application.yml` (`amqp.*`). catalog es productor y consumidor:
+
+| Rol | Exchange | Routing key | Cola / DLQ | Clase |
+|---|---|---|---|---|
+| Productor | `catalogo.stock.exchange` (direct) | `stock.bajo-minimo` | (la consume notify) | `service.StockAlertaPublisher`, beans en `config/RabbitMQConfig` |
+| Consumidor | `ordenes.negocio.exchange` (topic) | `ordenes.eventos.asignada` | `catalogo.stock.ordenes.queue` / `catalogo.stock.ordenes.dlq` | `mensajeria.ordenes.OrdenAsignadaConsumer`, beans en `config/OrdenesRabbitConfig` |
+
+Al asignar una orden se descuenta el stock de los repuestos de su servicio (todo o
+nada, una vez por orden, en `ORDER_STOCK_USAGE`).
+
+| Situacion | Decision (`mensajeria.ProcesadorDeMensajes`) |
+|---|---|
+| Descontado, sin repuestos o stock insuficiente (resultado de negocio, queda registrado) | `ACK` |
+| Mensaje invalido (JSON ilegible o sin orden o empresa) | `NACK` sin reencolar: a la DLQ de inmediato |
+| Falla transitoria (base de datos o red) | Hasta `amqp.reintentos.maximo` intentos (1 s, 2 s, 4 s...), luego a la DLQ |
+| Otro error | `NACK` a la DLQ sin reintentar |
+
 ## Integrantes
 
 | Integrante | GitHub |
@@ -33,12 +52,6 @@ Spring Boot 3, Spring Data JPA, Oracle, Flyway
 - [`ms-digitalfix-audit`](https://github.com/khrojasdev/ms-digitalfix-audit) - Microservicio
 - [`digitalfix-infra`](https://github.com/khrojasdev/digitalfix-infra) - Infraestructura
 
-## Pendiente por definir
-
-El documento del caso pide ademas *un microservicio administrador de RabbitMQ y otro de
-Kafka, segun la pauta de cada evaluacion*. Ni la EP1 ni la EP2 los evaluan, asi que no
-existen todavia como repositorios. Cuando la pauta de la evaluacion final los exija se
-agregaran como `ms-digitalfix-rabbit` y `ms-digitalfix-kafka`. La decision del equipo fue esperar la pauta.
 
 ## Tablero
 
