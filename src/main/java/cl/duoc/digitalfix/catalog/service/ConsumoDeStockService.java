@@ -4,6 +4,7 @@ import cl.duoc.digitalfix.catalog.domain.ConsumoDeOrden;
 import cl.duoc.digitalfix.catalog.domain.ConsumoDeOrden.Resultado;
 import cl.duoc.digitalfix.catalog.domain.Repuesto;
 import cl.duoc.digitalfix.catalog.domain.ServicioRepuesto;
+import cl.duoc.digitalfix.catalog.mensajeria.MensajeInvalido;
 import cl.duoc.digitalfix.catalog.repository.ConsumoDeOrdenRepository;
 import cl.duoc.digitalfix.catalog.repository.RepuestoRepository;
 import cl.duoc.digitalfix.catalog.repository.ServicioRepository;
@@ -64,7 +65,7 @@ public class ConsumoDeStockService {
             return Optional.empty();
         }
         if (evento.ordenId() == null || evento.empresaId() == null) {
-            throw new IllegalArgumentException("el evento ASIGNADA no trae ordenId o empresaId");
+            throw new MensajeInvalido("el evento ASIGNADA no trae ordenId o empresaId");
         }
         if (consumos.existsByCompanyIdAndOrdenId(evento.empresaId(), evento.ordenId())) {
             log.info("Orden {} ya tiene su descuento de stock registrado; evento {} ignorado.",

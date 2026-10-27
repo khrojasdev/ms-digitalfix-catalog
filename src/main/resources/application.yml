@@ -43,6 +43,11 @@ amqp:
   routing-key:
     stock-bajo-minimo: stock.bajo-minimo
     orden-asignada: ordenes.eventos.asignada
+  # Fallas transitorias (base de datos o red): cuantas veces se intenta y la
+  # espera inicial, que se duplica en cada intento. Ver mensajeria.ProcesadorDeMensajes.
+  reintentos:
+    maximo: 3
+    espera-ms: 1000
 
 server:
   port: ${SERVER_PORT:8082}
